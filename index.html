@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADS Bid Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .calculator {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .result-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .result-section h3 {
+            margin-bottom: 10px;
+            font-size: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>ADS Bid Calculator</h2>
+        <form id="bidCalculatorForm">
+            <label for="f1Workers">Number of F1 Workers:</label>
+            <input type="number" id="f1Workers" step="1">
+
+            <label for="g1Workers">Number of G1 Workers:</label>
+            <input type="number" id="g1Workers" step="1">
+
+            <label for="costPerHourF1">Cost Per Hour (F1):</label>
+            <input type="number" id="costPerHourF1" step="0.01">
+
+            <label for="costPerHourG1">Cost Per Hour (G1):</label>
+            <input type="number" id="costPerHourG1" step="0.01">
+
+            <label for="shopHrsTree">Shop Hours (e.g., P2P):</label>
+            <input type="number" id="shopHrsTree" step="0.01">
+
+            <label for="setupHrsTree">Job Site Setup Hours:</label>
+            <input type="number" id="setupHrsTree" step="0.01">
+
+            <label for="numTreeTrims">Number of Tree Trims:</label>
+            <input type="number" id="numTreeTrims" step="1">
+
+            <label for="numTreeRemovals">Number of Tree Removals:</label>
+            <input type="number" id="numTreeRemovals" step="1">
+
+            <label for="trimHrs">Hours for Trim:</label>
+            <input type="number" id="trimHrs" step="0.01">
+
+            <label for="removalHrs">Hours for Removal:</label>
+            <input type="number" id="removalHrs" step="0.01">
+
+            <label for="chipHrs">Hours for Chipping:</label>
+            <input type="number" id="chipHrs" step="0.01">
+
+            <label for="loadHrs">Hours for Loading Material:</label>
+            <input type="number" id="loadHrs" step="0.01">
+
+            <label for="haulHrs">Hours for Hauling to Dump:</label>
+            <input type="number" id="haulHrs" step="0.01">
+
+            <button type="button" onclick="calculateTotalCostAndTime()">Calculate Total Cost and Time</button>
+        </form>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function calculateTotalCostAndTime() {
+            const f1Workers = parseInt(document.getElementById('f1Workers').value) || 0;
+            const g1Workers = parseInt(document.getElementById('g1Workers').value) || 0;
+            const costPerHourF1 = parseFloat(document.getElementById('costPerHourF1').value) || 0;
+            const costPerHourG1 = parseFloat(document.getElementById('costPerHourG1').value) || 0;
+            const shopHrsTree = parseFloat(document.getElementById('shopHrsTree').value) || 0;
+            const setupHrsTree = parseFloat(document.getElementById('setupHrsTree').value) || 0;
+            const numTreeTrims = parseInt(document.getElementById('numTreeTrims').value) || 0;
+            const numTreeRemovals = parseInt(document.getElementById('numTreeRemovals').value) || 0;
+            const trimHrs = parseFloat(document.getElementById('trimHrs').value) || 0;
+            const removalHrs = parseFloat(document.getElementById('removalHrs').value) || 0;
+            const chipHrs = parseFloat(document.getElementById('chipHrs').value) || 0;
+            const loadHrs = parseFloat(document.getElementById('loadHrs').value) || 0;
+            const haulHrs = parseFloat(document.getElementById('haulHrs').value) || 0;
+
+            const totalTrimTime = numTreeTrims * (trimHrs + chipHrs + loadHrs + haulHrs);
+            const totalRemovalTime = numTreeRemovals * (removalHrs + chipHrs + loadHrs + haulHrs);
+            const totalTime = shopHrsTree + setupHrsTree + totalTrimTime + totalRemovalTime;
+
+            const totalHrs = totalTime;
+            const totalCostF1 = f1Workers * totalHrs * costPerHourF1;
+            const totalCostG1 = g1Workers * totalHrs * costPerHourG1;
+            const totalCost = totalCostF1 + totalCostG1;
+
+            let resultHTML = `
+                <div class="result-section">
+                    <h3>Summary</h3>
+                    Shop Hours: ${shopHrsTree.toFixed(2)} hours<br>
+                    Job Site Setup Hours: ${setupHrsTree.toFixed(2)} hours<br>
+                    Total Trim Time: ${totalTrimTime.toFixed(2)} hours<br>
+                    Total Removal Time: ${totalRemovalTime.toFixed(2)} hours<br>
+                    Total Time for All Trees: ${totalTime.toFixed(2)} hours<br>
+                    Total Cost: $${totalCost.toFixed(2)}
+                </div>
+            `;
+
+            const equipmentMultiplier1 = 0.15;
+            const equipmentMultiplier2 = 0.30;
+
+            for (let i = 1.5; i <= 2.5; i += 0.1) {
+                const totalWithMargin = totalCost * i;
+                const equipmentCost1 = totalWithMargin * equipmentMultiplier1;
+                const equipmentCost2 = totalWithMargin * equipmentMultiplier2;
+                resultHTML += `
+                    <div class="result-section">
+                        <h3>Margin Multiplier ${i.toFixed(1)}x</h3>
+                        Total Cost with ${i.toFixed(1)}x Margin: $${totalWithMargin.toFixed(2)}<br>
+                        Equipment Cost 0.15x of Total: $${equipmentCost1.toFixed(2)}<br>
+                        Equipment Cost 0.30x of Total: $${equipmentCost2.toFixed(2)}
+                    </div>
+                `;
+            }
+
+            document.getElementById('result').innerHTML = resultHTML;
+        }
+    </script>
+</body>
+</html>
